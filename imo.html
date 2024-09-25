@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Immobilien Rechner</title>
+</head>
+<body>
+    <h1>Immobilien Berechnung</h1>
+
+    <form id="calculatorForm">
+        <label for="mieteinnahme">Mieteinnahme pro Monat (€):</label>
+        <input type="number" id="mieteinnahme" required><br><br>
+
+        <label for="kaufpreis">Kaufpreis der Immobilie (€):</label>
+        <input type="number" id="kaufpreis" required><br><br>
+
+        <label for="maklerprovision">Maklerprovision (%):</label>
+        <input type="number" id="maklerprovision" required><br><br>
+
+        <label for="bundesland">Bundesland:</label>
+        <select id="bundesland" required>
+            <option value="5">Berlin (5% Kaufnebenkosten)</option>
+            <option value="6">Bayern (6% Kaufnebenkosten)</option>
+            <!-- Füge hier weitere Bundesländer und deren Kaufnebenkosten hinzu -->
+        </select><br><br>
+
+        <label for="anzahlung">Anzahlung (€):</label>
+        <input type="number" id="anzahlung" required><br><br>
+
+        <label for="zinsen">Zinsen (%):</label>
+        <input type="number" id="zinsen" required><br><br>
+
+        <label for="wohnnebenkosten">Wohnungsnebenkosten pro Monat (€):</label>
+        <input type="number" id="wohnnebenkosten" required><br><br>
+
+        <button type="button" onclick="berechne()">Berechnen</button>
+    </form>
+
+    <h2>Ergebnisse:</h2>
+    <p id="ergebnisMieteinnahmen"></p>
+    <p id="ergebnisGrundUndBoden"></p>
+    <p id="ergebnisMaklerprovision"></p>
+    <p id="ergebnisKaufnebenkosten"></p>
+    <p id="ergebnisZinsen"></p>
+    <p id="ergebnisWohnnebenkosten"></p>
+    <p id="steuerlicherVorteil"></p>
+
+    <script>
+        function berechne() {
+            // Eingabewerte
+            const mieteinnahme = parseFloat(document.getElementById('mieteinnahme').value);
+            const kaufpreis = parseFloat(document.getElementById('kaufpreis').value);
+            const maklerprovision = parseFloat(document.getElementById('maklerprovision').value) / 100;
+            const bundeslandKaufnebenkosten = parseFloat(document.getElementById('bundesland').value) / 100;
+            const anzahlung = parseFloat(document.getElementById('anzahlung').value);
+            const zinsen = parseFloat(document.getElementById('zinsen').value) / 100;
+            const wohnnebenkosten = parseFloat(document.getElementById('wohnnebenkosten').value);
+
+            // Berechnungen
+            const mieteinnahmeJahr = mieteinnahme * 12;
+            const kaufpreisGrundUndBoden = kaufpreis * 0.02;
+            const maklerkosten = kaufpreis * maklerprovision;
+            const kaufnebenkosten = kaufpreis * bundeslandKaufnebenkosten + maklerkosten;
+            const zinssumme = zinsen * 0.45 * ((kaufpreis + kaufnebenkosten) - anzahlung);
+            const wohnnebenkostenJahr = wohnnebenkosten * 12;
+
+            const ergebnis = mieteinnahmeJahr - kaufpreisGrundUndBoden - zinssumme - wohnnebenkostenJahr;
+
+            // Steuerlicher Vorteil, falls Ergebnis negativ ist
+            let steuerlicherVorteil = 0;
+            if (ergebnis < 0) {
+                steuerlicherVorteil = (ergebnis * -1) / 12;
+            }
+
+            // Ergebnisse anzeigen
+            document.getElementById('ergebnisMieteinnahmen').textContent = `Mieteinnahmen pro Jahr: € ${mieteinnahmeJahr.toFixed(2)}`;
+            document.getElementById('ergebnisGrundUndBoden').textContent = `Kaufpreisanteil Grund und Boden: € ${kaufpreisGrundUndBoden.toFixed(2)}`;
+            document.getElementById('ergebnisMaklerprovision').textContent = `Maklerprovision: € ${maklerkosten.toFixed(2)}`;
+            document.getElementById('ergebnisKaufnebenkosten').textContent = `Kaufnebenkosten: € ${kaufnebenkosten.toFixed(2)}`;
+            document.getElementById('ergebnisZinsen').textContent = `Zinsen: € ${zinssumme.toFixed(2)}`;
+            document.getElementById('ergebnisWohnnebenkosten').textContent = `Wohnungsnebenkosten pro Jahr: € ${wohnnebenkostenJahr.toFixed(2)}`;
+
+            if (steuerlicherVorteil > 0) {
+                document.getElementById('steuerlicherVorteil').textContent = `Steuerlicher Vorteil pro Monat: € ${steuerlicherVorteil.toFixed(2)}`;
+            } else {
+                document.getElementById('steuerlicherVorteil').textContent = `Kein steuerlicher Vorteil.`;
+            }
+        }
+    </script>
+</body>
+</html>
