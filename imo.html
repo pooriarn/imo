@@ -47,6 +47,9 @@
         <label for="wohnnebenkosten">Wohnungsnebenkosten pro Monat (€):</label>
         <input type="number" id="wohnnebenkosten" required><br><br>
 
+        <label for="rate">Monatliche Rate (€):</label>
+        <input type="number" id="rate" required><br><br>
+
         <button type="button" onclick="berechne()">Berechnen</button>
     </form>
 
@@ -58,6 +61,7 @@
     <p id="ergebnisZinsen"></p>
     <p id="ergebnisWohnnebenkosten"></p>
     <p id="steuerlicherVorteil"></p>
+    <p id="monatlicheBelastung"></p>
 
     <script>
         function berechne() {
@@ -65,16 +69,17 @@
             const mieteinnahme = parseFloat(document.getElementById('mieteinnahme').value);
             const kaufpreis = parseFloat(document.getElementById('kaufpreis').value);
             const maklerprovision = parseFloat(document.getElementById('maklerprovision').value) / 100;
-            const bundeslandKaufnebenkosten = parseFloat(document.getElementById('bundesland').value) / 100;
+            const grunderwerbsteuer = parseFloat(document.getElementById('bundesland').value) / 100;
             const anzahlung = parseFloat(document.getElementById('anzahlung').value);
             const zinsen = parseFloat(document.getElementById('zinsen').value) / 100;
             const wohnnebenkosten = parseFloat(document.getElementById('wohnnebenkosten').value);
+            const monatlicheRate = parseFloat(document.getElementById('rate').value);
 
             // Berechnungen
             const mieteinnahmeJahr = mieteinnahme * 12;
             const kaufpreisGrundUndBoden = kaufpreis * 0.02;
             const maklerkosten = kaufpreis * maklerprovision;
-            const kaufnebenkosten = kaufpreis * bundeslandKaufnebenkosten + maklerkosten;
+            const kaufnebenkosten = kaufpreis * grunderwerbsteuer + maklerkosten;
             const zinssumme = zinsen * 0.45 * ((kaufpreis + kaufnebenkosten) - anzahlung);
             const wohnnebenkostenJahr = wohnnebenkosten * 12;
 
@@ -86,11 +91,14 @@
                 steuerlicherVorteil = (ergebnis * -1) / 12;
             }
 
+            // Monatliche Belastung berechnen
+            const monatlicheBelastung = monatlicheRate - (mieteinnahme + steuerlicherVorteil);
+
             // Ergebnisse anzeigen
             document.getElementById('ergebnisMieteinnahmen').textContent = `Mieteinnahmen pro Jahr: € ${mieteinnahmeJahr.toFixed(2)}`;
             document.getElementById('ergebnisGrundUndBoden').textContent = `Kaufpreisanteil Grund und Boden: € ${kaufpreisGrundUndBoden.toFixed(2)}`;
             document.getElementById('ergebnisMaklerprovision').textContent = `Maklerprovision: € ${maklerkosten.toFixed(2)}`;
-            document.getElementById('ergebnisKaufnebenkosten').textContent = `Kaufnebenkosten: € ${kaufnebenkosten.toFixed(2)}`;
+            document.getElementById('ergebnisKaufnebenkosten').textContent = `Kaufnebenkosten (inkl. Grunderwerbsteuer): € ${kaufnebenkosten.toFixed(2)}`;
             document.getElementById('ergebnisZinsen').textContent = `Zinsen: € ${zinssumme.toFixed(2)}`;
             document.getElementById('ergebnisWohnnebenkosten').textContent = `Wohnungsnebenkosten pro Jahr: € ${wohnnebenkostenJahr.toFixed(2)}`;
 
@@ -98,6 +106,12 @@
                 document.getElementById('steuerlicherVorteil').textContent = `Steuerlicher Vorteil pro Monat: € ${steuerlicherVorteil.toFixed(2)}`;
             } else {
                 document.getElementById('steuerlicherVorteil').textContent = `Kein steuerlicher Vorteil.`;
+            }
+
+            if (monatlicheBelastung > 0) {
+                document.getElementById('monatlicheBelastung').textContent = `Monatlicher Eigenaufwand (Belastung): € ${monatlicheBelastung.toFixed(2)}`;
+            } else {
+                document.getElementById('monatlicheBelastung').textContent = `Überschuss pro Monat: € ${(monatlicheBelastung * -1).toFixed(2)}`;
             }
         }
     </script>
