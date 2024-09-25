@@ -44,11 +44,11 @@
         <label for="zinsen">Zinsen (%):</label>
         <input type="number" id="zinsen" required><br><br>
 
+        <label for="tilgung">Tilgung (%):</label>
+        <input type="number" id="tilgung" required><br><br>
+
         <label for="wohnnebenkosten">Wohnungsnebenkosten pro Monat (€):</label>
         <input type="number" id="wohnnebenkosten" required><br><br>
-
-        <label for="rate">Monatliche Rate (€):</label>
-        <input type="number" id="rate" required><br><br>
 
         <button type="button" onclick="berechne()">Berechnen</button>
     </form>
@@ -60,6 +60,7 @@
     <p id="ergebnisKaufnebenkosten"></p>
     <p id="ergebnisZinsen"></p>
     <p id="ergebnisWohnnebenkosten"></p>
+    <p id="ergebnisMonatlicheRate"></p>
     <p id="steuerlicherVorteil"></p>
     <p id="monatlicheBelastung"></p>
 
@@ -72,8 +73,8 @@
             const grunderwerbsteuer = parseFloat(document.getElementById('bundesland').value) / 100;
             const anzahlung = parseFloat(document.getElementById('anzahlung').value);
             const zinsen = parseFloat(document.getElementById('zinsen').value) / 100;
+            const tilgung = parseFloat(document.getElementById('tilgung').value) / 100;
             const wohnnebenkosten = parseFloat(document.getElementById('wohnnebenkosten').value);
-            const monatlicheRate = parseFloat(document.getElementById('rate').value);
 
             // Berechnungen
             const mieteinnahmeJahr = mieteinnahme * 12;
@@ -91,6 +92,9 @@
                 steuerlicherVorteil = (ergebnis * -1) / 12;
             }
 
+            // Monatliche Rate berechnen
+            const monatlicheRate = ((kaufpreis + kaufnebenkosten - anzahlung) * (zinsen + tilgung)) / 12;
+
             // Monatliche Belastung berechnen
             const monatlicheBelastung = monatlicheRate - (mieteinnahme + steuerlicherVorteil);
 
@@ -101,6 +105,7 @@
             document.getElementById('ergebnisKaufnebenkosten').textContent = `Kaufnebenkosten (inkl. Grunderwerbsteuer): € ${kaufnebenkosten.toFixed(2)}`;
             document.getElementById('ergebnisZinsen').textContent = `Zinsen: € ${zinssumme.toFixed(2)}`;
             document.getElementById('ergebnisWohnnebenkosten').textContent = `Wohnungsnebenkosten pro Jahr: € ${wohnnebenkostenJahr.toFixed(2)}`;
+            document.getElementById('ergebnisMonatlicheRate').textContent = `Monatliche Rate (inkl. Tilgung und Zinsen): € ${monatlicheRate.toFixed(2)}`;
 
             if (steuerlicherVorteil > 0) {
                 document.getElementById('steuerlicherVorteil').textContent = `Steuerlicher Vorteil pro Monat: € ${steuerlicherVorteil.toFixed(2)}`;
