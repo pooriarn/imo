@@ -105,8 +105,9 @@
             const monatlicheRate = (kreditsumme * (verwendeterZins + tilgung)) / 12;
            
 
-            // Monatliche Belastung berechnen
-            const monatlicheBelastung = monatlicheRate - (mieteinnahme + steuerlicherVorteil);
+            // Monatlicher Aufwand
+            const monatlicherAufwand = monatlicheRate - (mieteinnahme + (steuerlicherVorteil / 12));
+
 
             // Ergebnisse anzeigen
             document.getElementById('ergebnisMieteinnahmen').textContent = `Mieteinnahmen pro Jahr: € ${mieteinnahmeJahr.toFixed(2)}`;
