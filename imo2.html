@@ -84,7 +84,9 @@
             const mieteinnahmeJahr = mieteinnahme * 12;
             const kaufpreisGrundUndBoden = kaufpreis * 0.02;
             const maklerkosten = kaufpreis * maklerprovision;
-            const kaufnebenkosten = kaufpreis * grunderwerbsteuer + maklerkosten;
+            const notarKosten = kaufpreis * 0.015; // Notarkosten (1,5% des Kaufpreises)
+            const grundbuchKosten = kaufpreis * 0.005; // Grundbucheintrag (0,5% des Kaufpreises)
+            const kaufnebenkosten = kaufpreis * grunderwerbsteuer + maklerkosten + notarKosten + grundbuchKosten ;
             const zinssumme = zinsen * 0.45 * ((kaufpreis + kaufnebenkosten) - anzahlung);
             const wohnnebenkostenJahr = wohnnebenkosten * 12;
 
