@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Immobilien-Rechner</title>
+  <style>
+    :root{
+      --bg:#0f172a; --panel:#111827; --muted:#9ca3af; --text:#e5e7eb; --accent:#22c55e; --danger:#ef4444;
+      --border:#1f2937; --input:#0b1220;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
+      background:linear-gradient(180deg,#0b1020, #0f172a 40%, #0b1020);
+      color:var(--text);
+      line-height:1.4;
+    }
+    .container{
+      max-width:1000px; margin:40px auto; padding:0 16px;
+    }
+    header h1{margin:0 0 6px 0; font-size:28px}
+    header p{margin:0 0 24px 0; color:var(--muted)}
+    .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px}
+    .card{
+      background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px;
+      box-shadow:0 10px 30px rgba(0,0,0,.25);
+    }
+    label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px}
+    input,select{
+      width:100%; background:var(--input); color:var(--text); border:1px solid var(--border);
+      border-radius:10px; padding:12px; font-size:15px; outline:none;
+    }
+    input:focus,select:focus{border-color:#334155}
+    .row{display:flex; gap:10px}
+    .row > *{flex:1}
+    .btn{
+      appearance:none; border:none; padding:14px 16px; border-radius:12px; font-weight:600; cursor:pointer;
+      background:var(--accent); color:#052e16; width:100%;
+    }
+    .btn:active{transform:translateY(1px)}
+    .muted{color:var(--muted); font-size:13px}
+    .result h2{margin:0 0 12px 0}
+    .results p{margin:6px 0}
+    .pill{display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--border); color:var(--muted); font-size:12px}
+    .good{color:#16a34a}
+    .bad{color:#f87171}
+    .hr{height:1px; background:var(--border); margin:12px 0}
+    footer{margin:24px 0; color:var(--muted); font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Immobilien&nbsp;Berechnung</h1>
+      <p>Korrigierte Version mit AfA, aktualisierten GrESt-Sätzen und steuerlichem Effekt.</p>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <form id="calculatorForm">
+          <div class="grid">
+            <div>
+              <label for="mieteinnahme">Mieteinnahme pro Monat (€)</label>
+              <input type="number" id="mieteinnahme" min="0" step="0.01" required />
+            </div>
+
+            <div>
+              <label for="kaufpreis">Kaufpreis der Immobilie (€)</label>
+              <input type="number" id="kaufpreis" min="0" step="0.01" required />
+            </div>
+
+            <div>
+              <label for="maklerprovision">Maklerprovision (%)</label>
+              <input type="number" id="maklerprovision" min="0" step="0.01" value="3.57" required />
+            </div>
+
+            <div>
+              <label for="bundesland">Bundesland (Grunderwerbsteuer)</label>
+              <select id="bundesland" required>
+                <option value="5.0">Baden-Württemberg (5,0 %)</option>
+                <option value="3.5">Bayern (3,5 %)</option>
+                <option value="6.0">Berlin (6,0 %)</option>
+                <option value="6.5">Brandenburg (6,5 %)</option>
+                <option value="5.0">Bremen (5,0 %)</option>
+                <option value="5.5">Hamburg (5,5 %)</option>
+                <option value="6.0">Hessen (6,0 %)</option>
+                <option value="6.0">Mecklenburg-Vorpommern (6,0 %)</option>
+                <option value="5.0">Niedersachsen (5,0 %)</option>
+                <option value="6.5">Nordrhein-Westfalen (6,5 %)</option>
+                <option value="5.0">Rheinland-Pfalz (5,0 %)</option>
+                <option value="6.5">Saarland (6,5 %)</option>
+                <option value="5.5">Sachsen (5,5 %)</option>
+                <option value="5.0">Sachsen-Anhalt (5,0 %)</option>
+                <option value="6.5">Schleswig-Holstein (6,5 %)</option>
+                <option value="5.0">Thüringen (5,0 %)</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="anzahlung">Anzahlung (€)</label>
+              <input type="number" id="anzahlung" min="0" step="0.01" value="0" required />
+            </div>
+
+            <div>
+              <label for="zinsen">Nominalzins p. a. (%)</label>
+              <input type="number" id="zinsen" min="0" step="0.01" required />
+            </div>
+
+            <div>
+              <label for="tilgung">Anfängliche Tilgung p. a. (%)</label>
+              <input type="number" id="tilgung" min="0" step="0.01" required />
+            </div>
+
+            <div>
+              <label for="effektiverJahreszins">Effektiver Jahreszins (%) <span class="pill">optional</span></label>
+              <input type="number" id="effektiverJahreszins" min="0" step="0.01" placeholder="z. B. 4,2" />
+            </div>
+
+            <div>
+              <label for="wohnnebenkosten">Nicht umlagefähige Kosten pro Monat (€)</label>
+              <input type="number" id="wohnnebenkosten" min="0" step="0.01" value="0" required />
+            </div>
+
+            <div>
+              <label for="gebaeudeanteil">Gebäudeanteil am Kaufpreis (%)</label>
+              <input type="number" id="gebaeudeanteil" min="0" max="100" step="0.1" value="75" required />
+            </div>
+
+            <div>
+              <label for="afaSatz">AfA-Satz auf Gebäude (%)</label>
+              <input type="number" id="afaSatz" min="0" max="10" step="0.1" value="3.0" required />
+              <div class="muted">i. d. R. 3 % (ab 2023), 2 % (1925–2022), 2,5 % (vor 1925)</div>
+            </div>
+
+            <div>
+              <label for="steuersatz">Persönlicher Grenzsteuersatz (%)</label>
+              <input type="number" id="steuersatz" min="0" max="60" step="0.1" value="42" required />
+              <div class="muted">inkl. Soli/KiSt falls gewünscht</div>
+            </div>
+
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="row">
+            <button type="button" class="btn" id="btnBerechnen">Berechnen</button>
+          </div>
+
+          <p class="muted" style="margin-top:10px">
+            Hinweis: Monatsrate = (Nominal- oder Effektivzins + Tilgung) × Kreditsumme / 12 (vereinfachte deutsche Annuität, Anfangsrate).
+          </p>
+        </form>
+      </div>
+
+      <div class="card result">
+        <h2>Ergebnisse</h2>
+        <div class="results" id="results">
+          <p class="muted">Bitte Werte eingeben und „Berechnen“ klicken.</p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Diese Berechnung ersetzt keine Steuer-/Finanzberatung. Alle Angaben ohne Gewähr.
+    </footer>
+  </div>
+
+  <script>
+    const fmt = (n) => isFinite(n) ? n.toLocaleString('de-DE', { style:'currency', currency:'EUR' }) : '–';
+    const pct = (n) => isFinite(n) ? (n).toLocaleString('de-DE', { maximumFractionDigits:2 }) + ' %' : '–';
+
+    function val(id){
+      const el = document.getElementById(id);
+      const v = parseFloat(el.value.toString().replace(',', '.'));
+      return isNaN(v) ? 0 : v;
+    }
+
+    function berechne(){
+      // Eingaben
+      const mieteinnahmeMonat   = val('mieteinnahme');
+      const kaufpreis           = val('kaufpreis');
+      const maklerprovisionPct  = val('maklerprovision') / 100;
+      const grestPct            = parseFloat(document.getElementById('bundesland').value) / 100;
+      const anzahlung           = val('anzahlung');
+      const zinsenNominal       = val('zinsen') / 100;
+      const tilgung             = val('tilgung') / 100;
+      const effJahreszinsIn     = val('effektiverJahreszins') / 100;
+      const wohnnebenMonat      = val('wohnnebenkosten');
+      const gebaeudeanteilPct   = val('gebaeudeanteil') / 100;
+      const afaSatz             = val('afaSatz') / 100;
+      const steuersatz          = val('steuersatz') / 100;
+
+      // Plausibilitätsprüfungen
+      const errors = [];
+      if (kaufpreis <= 0) errors.push('Bitte einen Kaufpreis > 0 angeben.');
+      if (gebaeudeanteilPct < 0 || gebaeudeanteilPct > 1) errors.push('Gebäudeanteil muss zwischen 0 % und 100 % liegen.');
+      if (tilgung < 0) errors.push('Tilgung darf nicht negativ sein.');
+      if (zinsenNominal < 0) errors.push('Zins darf nicht negativ sein.');
+      if (anzahlung < 0) errors.push('Anzahlung darf nicht negativ sein.');
+      if (anzahlung > kaufpreis * 2) errors.push('Anzahlung erscheint unplausibel hoch.');
+      if (errors.length){
+        document.getElementById('results').innerHTML = '<p class="bad">' + errors.join('<br>') + '</p>';
+        return;
+      }
+
+      // Nebenkosten (Faustwerte)
+      const notarKosten    = kaufpreis * 0.015; // 1,5 % Notar
+      const grundbuchKosten= kaufpreis * 0.005; // 0,5 % Grundbuch
+      const grest          = kaufpreis * grestPct;
+      const maklerKosten   = kaufpreis * maklerprovisionPct;
+      const kaufnebenkosten= grest + notarKosten + grundbuchKosten + maklerKosten;
+
+      // Kreditsumme
+      const kreditsumme = Math.max(0, kaufpreis + kaufnebenkosten - anzahlung);
+
+      // Zinswahl: Effektivzins (falls eingegeben) sonst Nominalzins
+      const verwendeterZins = (effJahreszinsIn > 0 ? effJahreszinsIn : zinsenNominal);
+
+      // Monatsrate (vereinfachte Anfangsrate: (Zins + Tilgung) * Kreditsumme / 12)
+      const monatlicheRate = (kreditsumme * (verwendeterZins + tilgung)) / 12;
+
+      // Jahreswerte
+      const mieteinnahmeJahr     = mieteinnahmeMonat * 12;
+      const wohnnebenJahr        = wohnnebenMonat * 12;
+
+      // Zinsen als Werbungskosten (Anfangsjahr näherungsweise)
+      const zinsenJahr = kreditsumme * verwendeterZins;
+
+      // AfA (nur auf Gebäudeanteil, nicht auf Boden)
+      const gebaeudeBasis = kaufpreis * gebaeudeanteilPct;
+      const afaJahr       = gebaeudeBasis * afaSatz;
+
+      // Steuerliche Gewinnermittlung
+      const steuerlicherGewinn = mieteinnahmeJahr - wohnnebenJahr - zinsenJahr - afaJahr;
+      const steuer             = steuerlicherGewinn * steuersatz;
+      const steuerVorteilMonat = Math.max(0, -steuer / 12); // nur wenn Gewinn negativ
+
+      // Cashflow / Eigenaufwand
+      const monatlicheBelastung = monatlicheRate - (mieteinnahmeMonat + steuerVorteilMonat);
+
+      // Ausgabe
+      const res = [];
+
+      res.push(`<p><span class="pill">Mieteinnahmen pro Jahr</span><br><strong>${fmt(mieteinnahmeJahr)}</strong></p>`);
+      res.push(`<div class="hr"></div>`);
+
+      res.push(`<p><span class="pill">Kaufnebenkosten</span></p>`);
+      res.push(`<p>Grunderwerbsteuer: ${fmt(grest)}</p>`);
+      res.push(`<p>Notar: ${fmt(notarKosten)} · Grundbuch: ${fmt(grundbuchKosten)}</p>`);
+      res.push(`<p>Maklerprovision: ${fmt(maklerKosten)}</p>`);
+      res.push(`<p><strong>Summe Kaufnebenkosten: ${fmt(kaufnebenkosten)}</strong></p>`);
+      res.push(`<div class="hr"></div>`);
+
+      res.push(`<p><span class="pill">Finanzierung</span></p>`);
+      res.push(`<p>Kreditsumme: <strong>${fmt(kreditsumme)}</strong></p>`);
+      res.push(`<p>Zinssatz (verwendet): <strong>${pct((verwendeterZins*100))}</strong> · Tilgung: <strong>${pct(tilgung*100)}</strong></p>`);
+      res.push(`<p>Monatliche Rate (Anfang): <strong>${fmt(monatlicheRate)}</strong></p>`);
+      res.push(`<div class="hr"></div>`);
+
+      res.push(`<p><span class="pill">Werbungskosten & AfA</span></p>`);
+      res.push(`<p>Nicht umlagefähige Kosten p. a.: ${fmt(wohnnebenJahr)}</p>`);
+      res.push(`<p>Zinsen p. a.: ${fmt(zinsenJahr)}</p>`);
+      res.push(`<p>AfA p. a. (Gebäudeanteil ${pct(gebaeudeanteilPct*100)}, AfA-Satz ${pct(afaSatz*100)}): <strong>${fmt(afaJahr)}</strong></p>`);
+      res.push(`<div class="hr"></div>`);
+
+      res.push(`<p><span class="pill">Steuer</span></p>`);
+      res.push(`<p>Steuerlicher Gewinn/Verlust: <strong>${fmt(steuerlicherGewinn)}</strong></p>`);
+      res.push(`<p>Persönlicher Steuersatz: ${pct(steuersatz*100)}</p>`);
+      if (steuerVorteilMonat > 0){
+        res.push(`<p>Steuervorteil pro Monat: <strong class="good">${fmt(steuerVorteilMonat)}</strong></p>`);
+      } else {
+        res.push(`<p>Keine steuerliche Entlastung (positives Ergebnis).</p>`);
+      }
+      res.push(`<div class="hr"></div>`);
+
+      if (monatlicheBelastung > 0){
+        res.push(`<p><span class="pill">Monatlicher Eigenaufwand</span><br><strong class="bad">${fmt(monatlicheBelastung)}</strong></p>`);
+      } else {
+        res.push(`<p><span class="pill">Monatlicher Überschuss</span><br><strong class="good">${fmt(-monatlicheBelastung)}</strong></p>`);
+      }
+
+      document.getElementById('results').innerHTML = res.join('');
+    }
+
+    document.getElementById('btnBerechnen').addEventListener('click', berechne);
+  </script>
+</body>
+</html>
