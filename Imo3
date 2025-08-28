@@ -237,7 +237,7 @@
       const steuerVorteilMonat = Math.max(0, -steuer / 12); // nur wenn Gewinn negativ
 
       // Cashflow / Eigenaufwand
-      const monatlicheBelastung = monatlicheRate - (mieteinnahmeMonat + steuerVorteilMonat);
+      const monatlicheBelastung = (monatlicheRate + wohnnebenkosten) - (mieteinnahme + steuerlicherVorteil);
 
       // Ausgabe
       const res = [];
